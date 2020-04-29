@@ -9,3 +9,7 @@
 	li $v0, 4
 	la $a0, prompt
 	syscall
+	
+	# get actual size
+	li $v0, 5
+	syscall
