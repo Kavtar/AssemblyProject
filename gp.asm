@@ -13,3 +13,6 @@
 	# get actual size
 	li $v0, 5
 	syscall
+	
+	# store result in $t0
+	move $t0, $v0
