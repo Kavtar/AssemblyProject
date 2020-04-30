@@ -15,8 +15,9 @@
 	validInputMessageLogging: .asciiz ">Input is valid. Processing..\n"
 	invalidInputMessageLogging: .asciiz ">Input isn't greater than 2. Terminating...\n"
 	endProgramMessageLogging: .asciiz "Program finished"
-	overflowExceptionMessageLogging: .asciiz "Integer overflow has occured\n"
-	successMessageLogging: .asciiz "Output generated successfully\n"
+	overflowTerminateMessageForLogging: .asciiz "Program terminated smoothly"
+	successMessageLogging: .asciiz "Output generated successfully :)"
+	overflowMessageForLogging: .asciiz "Overflow has occured; integer exceeded 2,147,483,647 (32 bit)\n"
 .text
 	# open file
 	li $v0, 13 			# open file with syscall code 13
@@ -98,16 +99,44 @@
 	li   $s2, 1           # 1 is the known value of first and second Fib. number
       	sw   $s2, 0($s0)      # F[0] = 1
       	sw   $s2, 4($s0)      # F[1] = F[0] = 1
-      	addi $s1, $t0, -2     # Counter for loop, will execute (size-2) times
+      	addi $s7, $t0, -2     # Counter for loop, will execute (size-2) times
       
       	# Loop to compute each Fibonacci number using the previous two Fib. numbers.
 loop: 	lw   $s3, 0($s0)      # Get value from array F[n-2]
       	lw   $s4, 4($s0)      # Get value from array F[n-1]
+      	#######
+      	addi $t7, $zero, 1073741823
+      	blt $s3, $t7, BranchOnNotOverflow
+      	# write into file
+	li $v0, 15				# write file syscall code = 15
+	move $a0, $s1				# file descriptor
+	la $a1, overflowMessageForLogging	# string which will be written
+	la $a2, 64				# specify string length
+	syscall
+	# write into file
+	li $v0, 15					# write file syscall code = 15
+	move $a0, $s1					# file descriptor
+	la $a1, overflowTerminateMessageForLogging	# string which will be written
+	la $a2, 26					# specify string length
+	syscall
+	# close file
+	li $v0, 16		# close file, syscall code = 16
+	move $a0, $s1		# file descriptor
+	syscall
+	
+	#---------------------------------------------#
+	
+	
+      	# The program is finished. Exit.
+      	li   $v0, 10          # system call for exit
+      	syscall               # Exit!
+      	############
+      	BranchOnNotOverflow:
       	add  $s2, $s3, $s4    # F[n] = F[n-1] + F[n-2]
       	sw   $s2, 8($s0)      # Store newly computed F[n] in array
       	addi $s0, $s0, 4      # increment address to now-known Fib. number storage
-      	addi $s1, $s1, -1     # decrement loop counter
-      	bgtz $s1, loop        # repeat while not finished
+      	addi $s7, $s7, -1     # decrement loop counter
+      	bgtz $s7, loop        # repeat while not finished
       
       	# Fibonacci numbers are computed and stored in array. Print them.
       	la   $a0, fibs        # first argument for print (array)
@@ -116,6 +145,13 @@ loop: 	lw   $s3, 0($s0)      # Get value from array F[n-2]
 
 
 	#---------------------------------------------#
+	
+	# write into file
+	li $v0, 15				# write file syscall code = 15
+	move $a0, $s1				# file descriptor
+	la $a1, successMessageLogging	# string which will be written
+	la $a2, 32				# specify string length
+	syscall
 	
 	# close file
 	li $v0, 16		# close file, syscall code = 16
