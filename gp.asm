@@ -9,8 +9,36 @@
 	space:.asciiz  " "          # space to insert between numbers
 	head: .asciiz  "The Fibonacci numbers are:\n"
 	fibs: .word   0 : 50         # "array" of words to contain fib values
+	fileName: .asciiz "D:\logs.txt"
+	startMessageLogging: .asciiz "Execution started:\n"
+	promptMessageLogging: .asciiz "Prompting user for input...\n"
+	validInputMessageLogging: .asciiz ">Input is valid. Processing..\n"
+	invalidInputMessageLogging: .asciiz ">Input isn't greater than 2. Terminating...\n"
 .text
-
+	# open file
+	li $v0, 13 			# open file with syscall code 13
+	la $a0, fileName		# get the file name
+	li $a1, 1			# set file flag to write (1)
+	syscall
+	move $s1, $v0			# save the file descriptor $s0 = file
+	
+	# write into file
+	li $v0, 15			# write file syscall code = 15
+	move $a0, $s1			# file descriptor
+	la $a1, startMessageLogging	# string which will be written
+	la $a2, 20			# specify string length
+	syscall
+	
+	
+	#-----------------------------------------------------------------#
+	
+	# write into file
+	li $v0, 15			# write file syscall code = 15
+	move $a0, $s1			# file descriptor
+	la $a1, promptMessageLogging	# string which will be written
+	la $a2, 29			# specify string length
+	syscall
+	
 	# prompt user to enter size
 	li $v0, 4
 	la $a0, prompt
@@ -28,11 +56,34 @@
 	li $v0, 4
 	la $a0, messageForInvalid
 	syscall
+	
+	# write into file
+	li $v0, 15				# write file syscall code = 15
+	move $a0, $s1				# file descriptor
+	la $a1, invalidInputMessageLogging	# string which will be written
+	la $a2, 44				# specify string length
+	syscall
+	
+	#---------------------------------------------#
+	
+	# close file
+	li $v0, 16		# close file, syscall code = 16
+	move $a0, $s1		# file descriptor
+	syscall
+	
+	#---------------------------------------------#
 	# terminate program
 	li $v0, 10
 	syscall
 	
 	InputIsValid:
+	# write into file
+	li $v0, 15				# write file syscall code = 15
+	move $a0, $s1				# file descriptor
+	la $a1, validInputMessageLogging	# string which will be written
+	la $a2, 32				# specify string length
+	syscall
+	
 	li $v0, 4
 	la $a0, messageForValid
 	syscall
@@ -60,6 +111,17 @@ loop: 	lw   $s3, 0($s0)      # Get value from array F[n-2]
       	add  $a1, $zero, $t0  # second argument for print (size)
       	jal  PrintArray            # call print routine. 
 
+
+	#---------------------------------------------#
+	
+	# close file
+	li $v0, 16		# close file, syscall code = 16
+	move $a0, $s1		# file descriptor
+	syscall
+	
+	#---------------------------------------------#
+	
+	
       	# The program is finished. Exit.
       	li   $v0, 10          # system call for exit
       	syscall               # Exit!
