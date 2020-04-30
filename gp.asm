@@ -14,6 +14,9 @@
 	promptMessageLogging: .asciiz "Prompting user for input...\n"
 	validInputMessageLogging: .asciiz ">Input is valid. Processing..\n"
 	invalidInputMessageLogging: .asciiz ">Input isn't greater than 2. Terminating...\n"
+	endProgramMessageLogging: .asciiz "Program finished"
+	overflowExceptionMessageLogging: .asciiz "Integer overflow has occured\n"
+	successMessageLogging: .asciiz "Output generated successfully\n"
 .text
 	# open file
 	li $v0, 13 			# open file with syscall code 13
