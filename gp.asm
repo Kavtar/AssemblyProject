@@ -1,6 +1,6 @@
 .data
 	prompt: .asciiz "Enter size: "
-	messageForInvalid: .asciiz "Input is invalid, size matters!"
+	messageForInvalid: .asciiz "Input is invalid!"
 	comma: .asciiz ","
 	space:.asciiz  " "           # space to insert between numbers
 	head: .asciiz  "The Fibonacci numbers are:\n"
