@@ -1,3 +1,4 @@
+#start
 .data
 	prompt: .asciiz "Enter size: "
 	messageForInvalid: .asciiz "Input is invalid!"
